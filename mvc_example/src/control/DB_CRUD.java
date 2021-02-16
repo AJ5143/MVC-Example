@@ -9,8 +9,6 @@ import model.*;
 import view.*;
 public class DB_CRUD {
 
-
-
 	public boolean insertData(Bin data) 
 	{
 		boolean result = false;
@@ -20,7 +18,7 @@ public class DB_CRUD {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
 	        preparedStmt.setString(1, data.getUserName());
-	        preparedStmt.setString(2, data.getPassword());
+	        preparedStmt.setString(2, data.getNewPassword());
 	        preparedStmt.execute();
 	        result = true;
         }
@@ -31,22 +29,43 @@ public class DB_CRUD {
 		return result;
 	}
 
-	public void updateData(Bin data) {
-				
-		String query1 = "Update first SET Password = ? WHERE Username = ? AND Password = ?";
+	public boolean updateData(Bin data) {
+		boolean result = false;	
+		String query1 = "Update first SET Password = ? WHERE Password = ?";
 		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
 		try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
-	        preparedStmt.setString(1, data.setNewpassword(data.getNewpassword());
-	        preparedStmt.setString(2, data.getUserName());
-	        preparedStmt.setString(3, data.getOldpassword());
+			preparedStmt.setString(1, data.setNewPassword(data.getNewPassword()));
+	        preparedStmt.setString(2, data.setOldPassword(data.getOldPassword()));
+	        //preparedStmt.setString(3, data.getOldPassword());
 	        preparedStmt.execute();
+	        result = true;
         }
 		catch(Exception e) {
 			e.printStackTrace();
 		}
 		
+		return result;
+	}
+
+	public boolean deleteData(Bin data) {
+		boolean result = false;
+		String query1 = "Delete from first WHERE Username = ?";
+		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		try {
+			Connection connection = DriverManager.getConnection(link);
+			PreparedStatement preparedStmt = connection.prepareStatement(query1);
+			preparedStmt.setString(1, data.getUserName());
+	        preparedStmt.execute();
+	        result = true;
+        }
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		
+		return result;
 	}
 
 }
