@@ -4,7 +4,15 @@ import control.*;
 
 
 public class Bin {
-	String userName,oldpassword, newpassword;
+	private String userName,oldPassword, newPassword;
+	private int userID;
+	public int getUserID() {
+		return userID;
+	}
+
+	public void setUserID(int userID) {
+		this.userID = userID;
+	}
 
 	public String getUserName() {
 		return userName;
@@ -14,31 +22,37 @@ public class Bin {
 		this.userName = userName;
 	}
 
-	public String getOldpassword() {
-		return oldpassword;
+	public String setOldPassword(String oldpass) {
+		
+		this.oldPassword = oldpass;
+		return oldPassword;
+		
+	}
+	
+	public String getOldPassword() {
+		return oldPassword;
 	}
 
-	public void setOldpassword(String oldpassword) {
-		this.oldpassword = oldpassword;
+	public String getNewPassword() {
+		return newPassword;
 	}
 
-	public String getNewpassword() {
-		return newpassword;
+	public String setNewPassword(String newpassword) {
+		this.newPassword = newpassword;
+		return newPassword;
 	}
 
-	public void setNewpassword(String newpassword) {
-		this.newpassword = newpassword;
-	}
-
-	public Bin(String userName, String oldpassword, String newpassword) {
+	public Bin(String userName, String oldPassword, String newPassword, int userID) {
 		super();
 		this.userName = userName;
-		this.oldpassword = oldpassword;
-		this.newpassword = newpassword;
+		this.oldPassword = oldPassword;
+		this.newPassword = newPassword;
+		this.userID = userID;
 	}
 
 	public Bin() {
+		// TODO Auto-generated constructor stub
 	}
-	
+
 	
 }
