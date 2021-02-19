@@ -1,5 +1,5 @@
 // Work completed: All CRUD buttons working
-// Insert Data bug
+// Insert Data bug EDIT : Solved!
 // Table view query
 // Inserting and Updating data inside table 
 // Buttons inside table 
@@ -7,18 +7,31 @@
 
 package view;
 import model.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+
 import control.*;
 import javafx.application.Application;
+import javafx.beans.property.ReadOnlyStringWrapper;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -29,9 +42,16 @@ import javafx.scene.text.Text;
 
 
 public class Main extends Application {
+	
+	public TableView<User> table;
+	
+	DB_CRUD db = new DB_CRUD();
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			//TODO i have to complete this
+			
 			HBox hbuserDetails = new HBox();
 			HBox hbpasswordDetails = new HBox();
 			HBox hbsignin = new HBox();
@@ -60,36 +80,100 @@ public class Main extends Application {
 			VBox vbpwField = new VBox(pwBox);
 			vbpwField.setAlignment(Pos.CENTER);
 
-			Label lblforgotPass = new Label("forgot password");
-			VBox vbforgotPass = new VBox(lblforgotPass);
-			vbforgotPass.setAlignment(Pos.CENTER);
+			//Label lblforgotPass = new Label("forgot password");
+			//VBox vbforgotPass = new VBox(lblforgotPass);
+			//vbforgotPass.setAlignment(Pos.CENTER);
 
 			Button btnInsert = new Button("Insert");
 			Button btnUpdatePwd = new Button("Update Password");
 			Button btnDelete = new Button("Delete");
 			
-			TableView<Bin> table = new TableView<Bin>();
-			TableColumn<Bin, String> UserNameColumn = new TableColumn<Bin, String>("UserName");
-			UserNameColumn.setCellValueFactory(new PropertyValueFactory<Bin, String>("userName"));
+			table = new TableView<User>();
+			ObservableList<User> tableData = FXCollections.observableArrayList();
 			
-			TableColumn<Bin, String> PasswordColumn = new TableColumn<Bin, String>("Password");
-			PasswordColumn.setCellValueFactory(new PropertyValueFactory<Bin, String>("newPassword"));
+			TableColumn<User, String> UserIDColumn = new TableColumn<User, String>("UserID");
+			//UserNameColumn.setCellValueFactory(new PropertyValueFactory<Bin, String>("userName"));
 			
-			table.getColumns().add(UserNameColumn);
-			table.getColumns().add(PasswordColumn);
+			UserIDColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			UserIDColumn.setOnEditCommit(
+	                event -> event.getRowValue().setUserID(Integer.parseInt(event.getNewValue())));
+			UserIDColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(String.valueOf(data.getValue().getUserID())));
 			
-			table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+			
+			TableColumn<User, String> UserNameColumn = new TableColumn<User, String>("UserName");
+			//UserNameColumn.setCellValueFactory(new PropertyValueFactory<Bin, String>("userName"));
+			
+			UserNameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			UserNameColumn.setOnEditCommit(
+	                event -> event.getRowValue().setUserName(event.getNewValue()));
+			UserNameColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getUserName()));
 			
 			
+			
+			TableColumn<User, String> PasswordColumn = new TableColumn<User, String>("Password");
+			//PasswordColumn.setCellValueFactory(new PropertyValueFactory<Bin, String>("newPassword"));
+			PasswordColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+			PasswordColumn.setOnEditCommit(
+	                event -> event.getRowValue().setNewPassword(event.getNewValue()));
+			PasswordColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getNewPassword()));
+			
+			TableColumn<User, Button> ActionColumn = new TableColumn<>("Action");
+		    ActionColumn.setSortable(false);
+		    ActionColumn.setCellValueFactory(new PropertyValueFactory<User, Button>("actionButton"));
+		    
+		    table.getColumns().setAll(UserIDColumn, UserNameColumn, PasswordColumn, ActionColumn);
+		    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		    tableData.setAll(db.buildData());
+			table.setItems(tableData);
+		    //define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
+//		    ActionColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<User, Boolean>, ObservableValue<Boolean>>() {
+//		        @Override public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<User, Boolean> features) {
+//		          return new SimpleBooleanProperty(features.getValue() != null);
+//		        }
+//		      });
+//		    
+//		 // create a cell value factory with a button for each row in the table.
+//		    ActionColumn.setCellFactory(new Callback<TableColumn<User, Boolean>, TableCell<User, Boolean>>() {
+//		      @Override public TableCell<User, Boolean> call(TableColumn<User, Boolean> personBooleanTableColumn) {
+//		        return new AddButtonsCell(primaryStage, table);
+//		      }
+//		    });
+//			
+			
+//			table.getColumns().add(UserNameColumn);
+//			table.getColumns().add(PasswordColumn);
+			//table.setEditable(true);
+			
+			
+//			public void buildData(){ 
+//				   // tableData = FXCollections.observableArrayList();
+//				    try{      
+//				    	String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+//				    	Connection con = DriverManager.getConnection(link);
+//				        String SQL = "Select * from first Order By Username";            
+//				        ResultSet rs = con.createStatement().executeQuery(SQL);  
+//				        while(rs.next()){
+//				            Bin user = new Bin();
+//				            user.setUserID(rs.getInt("UserID"));                       
+//				            user.setUserName(rs.getString("UserName"));
+//				            user.setNewPassword(rs.getString("Password"));
+//				            tableData.add(user);                  
+//				        }
+//				        table.setItems(tableData);
+//				   catch(Exception e){ 
+//					   
+//				   }
+//				   }
+//				}
+
 			btnInsert.setOnAction(e->{
-				Bin data = new Bin();
+				User data = new User();
 				data.setUserName(txtuserTextField.getText());
 				data.setNewPassword(pwBox.getText());
 				DB_CRUD control = new DB_CRUD();
-				control.insertData(data);
-				if(control.insertData(data)==true) {
-					Label lblsecondLabel = new Label("Data inserted successfully!");
-					 
+				if(txtuserTextField.getText().equals(null) || pwBox.getText().equals(null))
+				{
+					Label lblsecondLabel = new Label("Please provide username and password both!");
 	                StackPane secondaryLayout = new StackPane();
 	                secondaryLayout.getChildren().add(lblsecondLabel);
 	 
@@ -105,6 +189,30 @@ public class Main extends Application {
 	                newWindow.setY(primaryStage.getY() + 100);
 	 
 	                newWindow.show();
+				}
+				boolean insertFlag = control.insertData(data);
+				if(insertFlag==true) {
+					Label lblsecondLabel = new Label("Data inserted successfully!");
+	                StackPane secondaryLayout = new StackPane();
+	                secondaryLayout.getChildren().add(lblsecondLabel);
+	 
+	                Scene secondScene = new Scene(secondaryLayout, 230, 100);
+	 
+	                // New window (Stage)
+	                Stage newWindow = new Stage();
+	                newWindow.setTitle("Second Stage");
+	                newWindow.setScene(secondScene);
+	 
+	                // Set position of second window, related to primary window.
+	                newWindow.setX(primaryStage.getX() + 200);
+	                newWindow.setY(primaryStage.getY() + 100);
+	 
+	                newWindow.show();
+	                //table.refresh();
+	                //table.getItems().clear();
+	                table.setItems(tableData);
+	                
+	                
 				}
 				else {
 					Label lblsecondLabel = new Label("Couldn't insert data!");
@@ -145,13 +253,13 @@ public class Main extends Application {
 				
 				Button btnUpdate = new Button("Update");
 				btnUpdate.setOnAction(ev -> {
-					Bin data = new Bin();
+					User data = new User();
 					//data.getUserName(txtPasswordUpdateuserTextField.getText());
 					data.setOldPassword(pwBoxOld.getText());
 					data.setNewPassword(pwBoxNew.getText());
 					DB_CRUD control = new DB_CRUD();
-					control.updateData(data);
-					if(control.updateData(data)==true) {
+					boolean flagUpdate = control.updateData(data);
+					if(flagUpdate==true) {
 						Label lblsecondLabel = new Label("Password updated successfully!");
 						 
 		                StackPane secondaryLayout2 = new StackPane();
@@ -169,6 +277,7 @@ public class Main extends Application {
 		                newWindow.setY(primaryStage.getY() + 100);
 		 
 		                newWindow.show();
+		                table.refresh();
 					}
 					else {
 						Label lblsecondLabel = new Label("Couldn't update password!");
@@ -217,11 +326,11 @@ public class Main extends Application {
 			btnDelete.setOnAction(e -> {
 				//Label lblDeleteUName = new Label("Username: ");
 				//TextField txtUserTextField = new TextField();
-				Bin data = new Bin();
+				User data = new User();
 				data.setUserName(txtuserTextField.getText());
 				DB_CRUD control = new DB_CRUD();
-				control.deleteData(data);
-				if(control.deleteData(data)==true) {
+				boolean flagDeleteData = control.deleteData(data);
+				if(flagDeleteData==true) {
 					Label lblsecondLabel = new Label("Row deleted successfully!");
 					 
 	                StackPane secondaryLayout2 = new StackPane();
@@ -239,6 +348,7 @@ public class Main extends Application {
 	                newWindow.setY(primaryStage.getY() + 100);
 	 
 	                newWindow.show();
+	                table.refresh();
 				}
 				else {
 					Label lblsecondLabel = new Label("Couldn't delete row!");
@@ -287,7 +397,12 @@ public class Main extends Application {
 			
 			hbuserDetails.getChildren().addAll(vbuserName,vbtxtField);
 			hbpasswordDetails.getChildren().addAll(vbpw,vbpwField);
-			hbsignin.getChildren().addAll(vbforgotPass,vbInsert,vbUpdate,vbDelete);
+			hbsignin.getChildren().addAll(vbInsert,vbUpdate,vbDelete);
+			
+			hbuserDetails.setAlignment(Pos.CENTER);
+			hbpasswordDetails.setAlignment(Pos.CENTER);
+			hbsignin.setAlignment(Pos.CENTER);
+			
 			vbFinal.getChildren().addAll(hbuserDetails,hbpasswordDetails,hbsignin,table);
 			Scene scene = new Scene(vbFinal,400,400);
 			//scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
