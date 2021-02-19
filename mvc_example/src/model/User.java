@@ -1,7 +1,9 @@
 package model;
 import view.*;
 import control.*;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Button;
+import javafx.scene.control.TableView;
 
 
 public class User {
@@ -52,6 +54,7 @@ public class User {
 
 	public void setActionButton(Button actionButton) {
 		this.actionButton = actionButton;
+		
 	}
 
 	public User(String userName, String oldPassword, String newPassword, int userID) {
@@ -74,6 +77,15 @@ public class User {
 		this.userID = userID;
 		this.actionButton = actionButton;
 	}
+public void onButtonClick(TableView<User> table) {
+	// TODO Auto-generated method stub
+	actionButton.setOnAction(e -> {
+		ObservableList<User> userSelected, allUsers;
+		allUsers = table.getItems();
+		userSelected = table.getSelectionModel().getSelectedItems();
+		userSelected.forEach(allUsers::remove);
+		
+	});
+}
 
-	
 }

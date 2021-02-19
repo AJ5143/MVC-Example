@@ -18,7 +18,7 @@ public class DB_CRUD {
 	{
 		boolean result = false;
 		String query1 = "insert into first(Username,Password)" + "values(?,?)";
-		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
 		try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
@@ -37,7 +37,7 @@ public class DB_CRUD {
 	public boolean updateData(User data) {
 		boolean result = false;	
 		String query1 = "Update first SET Password = ? WHERE Password = ?";
-		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
 		try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
@@ -57,7 +57,7 @@ public class DB_CRUD {
 	public boolean deleteData(User data) {
 		boolean result = false;
 		String query1 = "Delete from first WHERE Username = ?";
-		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
 		try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
@@ -80,7 +80,7 @@ public class DB_CRUD {
 	public ObservableList<User> buildData(){ 
 	    data = FXCollections.observableArrayList();
 	    try{      
-	    	String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+	    	String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
 	    	Connection con = DriverManager.getConnection(link);
 	        String SQL = "Select * from first Order By UserID";            
 	        ResultSet rs = con.createStatement().executeQuery(SQL);  
@@ -90,6 +90,7 @@ public class DB_CRUD {
 	            user.setUserName(rs.getString("UserName"));
 	            user.setNewPassword(rs.getString("Password"));
 	            user.setActionButton(new Button("DELETE"));
+	            
 	            data.add(user);                  
 	        }
 	        return data;

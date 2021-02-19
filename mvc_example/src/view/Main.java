@@ -46,7 +46,7 @@ public class Main extends Application {
 	public TableView<User> table;
 	
 	DB_CRUD db = new DB_CRUD();
-	
+	User user = new User();
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -121,10 +121,13 @@ public class Main extends Application {
 		    ActionColumn.setSortable(false);
 		    ActionColumn.setCellValueFactory(new PropertyValueFactory<User, Button>("actionButton"));
 		    
+		    
+		    
 		    table.getColumns().setAll(UserIDColumn, UserNameColumn, PasswordColumn, ActionColumn);
 		    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		    tableData.setAll(db.buildData());
 			table.setItems(tableData);
+			user.onButtonClick(table);
 		    //define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
 //		    ActionColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<User, Boolean>, ObservableValue<Boolean>>() {
 //		        @Override public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<User, Boolean> features) {
@@ -167,6 +170,7 @@ public class Main extends Application {
 //				}
 
 			btnInsert.setOnAction(e->{
+				
 				User data = new User();
 				data.setUserName(txtuserTextField.getText());
 				data.setNewPassword(pwBox.getText());
