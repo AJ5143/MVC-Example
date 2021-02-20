@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -44,12 +45,12 @@ import javafx.scene.text.Text;
 public class Main extends Application {
 	
 	public TableView<User> table;
-	
-	DB_CRUD db = new DB_CRUD();
 	User user = new User();
+	DB_CRUD db = new DB_CRUD();
+	ObservableList<User> tableData = FXCollections.observableArrayList();
+	
 	@Override
-	public void start(Stage primaryStage) 
-	{
+	public void start(Stage primaryStage) {
 		try {
 			//TODO i have to complete this
 			
@@ -90,7 +91,7 @@ public class Main extends Application {
 			Button btnDelete = new Button("Delete");
 			
 			table = new TableView<User>();
-			ObservableList<User> tableData = FXCollections.observableArrayList();
+			
 			
 			TableColumn<User, String> UserIDColumn = new TableColumn<User, String>("UserID");
 			//UserNameColumn.setCellValueFactory(new PropertyValueFactory<Bin, String>("userName"));
@@ -122,13 +123,22 @@ public class Main extends Application {
 		    ActionColumn.setSortable(false);
 		    ActionColumn.setCellValueFactory(new PropertyValueFactory<User, Button>("actionButton"));
 		    
+//		    TableColumn<User, Button> DeleteColumn = new TableColumn<>("Delete");
+//		    DeleteColumn.setSortable(false);
+//		    DeleteColumn.setCellValueFactory(new PropertyValueFactory<User, Button>("deleteButton"));
+//		    
+//		    TableColumn<User, Button> UpdateColumn = new TableColumn<>("Update");
+//		    UpdateColumn.setSortable(false);
+//		    UpdateColumn.setCellValueFactory(new PropertyValueFactory<User, Button>("updateButton"));
 		    
-		    
+//		    ActionColumn.getColumns().addAll(DeleteColumn, UpdateColumn);
 		    table.getColumns().setAll(UserIDColumn, UserNameColumn, PasswordColumn, ActionColumn);
-		    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+		    
+		    //buttonPressed(table, primaryStage);
+		    tableData.setAll(db.buildData());
+			table.setItems(tableData);
+
 		    refreshTable();
-			
-			
 			
 			user.onButtonClick(table);
 		    //define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
@@ -149,36 +159,13 @@ public class Main extends Application {
 //			table.getColumns().add(UserNameColumn);
 //			table.getColumns().add(PasswordColumn);
 			//table.setEditable(true);
-			
-			
-//			public void buildData(){ 
-//				   // tableData = FXCollections.observableArrayList();
-//				    try{      
-//				    	String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
-//				    	Connection con = DriverManager.getConnection(link);
-//				        String SQL = "Select * from first Order By Username";            
-//				        ResultSet rs = con.createStatement().executeQuery(SQL);  
-//				        while(rs.next()){
-//				            Bin user = new Bin();
-//				            user.setUserID(rs.getInt("UserID"));                       
-//				            user.setUserName(rs.getString("UserName"));
-//				            user.setNewPassword(rs.getString("Password"));
-//				            tableData.add(user);                  
-//				        }
-//				        table.setItems(tableData);
-//				   catch(Exception e){ 
-//					   
-//				   }
-//				   }
-//				}
 
 			btnInsert.setOnAction(e->{
-				
 				User data = new User();
 				data.setUserName(txtuserTextField.getText());
 				data.setNewPassword(pwBox.getText());
 				DB_CRUD control = new DB_CRUD();
-				if(txtuserTextField.getText().isEmpty() && pwBox.getText().isEmpty())
+				if(txtuserTextField.getText().isEmpty() || pwBox.getText().isEmpty())
 				{
 					Label lblsecondLabel = new Label("Please provide username and password both!");
 	                StackPane secondaryLayout = new StackPane();
@@ -198,13 +185,11 @@ public class Main extends Application {
 	                newWindow.show();
 				}
 				boolean insertFlag = control.insertData(data);
-				if(insertFlag==true) {
-					refreshTable();
-					
+				if(insertFlag==true) 
+				{
 					Label lblsecondLabel = new Label("Data inserted successfully!");
 	                StackPane secondaryLayout = new StackPane();
 	                secondaryLayout.getChildren().add(lblsecondLabel);
-	                
 	 
 	                Scene secondScene = new Scene(secondaryLayout, 230, 100);
 	 
@@ -220,10 +205,12 @@ public class Main extends Application {
 	                newWindow.show();
 	                //table.refresh();
 	                //table.getItems().clear();
+	                table.setItems(tableData);
 	                
 	                
 				}
-				else {
+				else 
+				{
 					Label lblsecondLabel = new Label("Couldn't insert data!");
 					 
 	                StackPane secondaryLayout = new StackPane();
@@ -243,14 +230,12 @@ public class Main extends Application {
 	                newWindow.show();
 				}
 				
+				refreshTable();
 			});
 			btnUpdatePwd.setOnAction(e -> {
-				//Label lblPasswordUpdateUName = new Label("Username: ");
 				Label lblPasswordUpdateOldPass = new Label("Enter old password: ");
 				Label lblPasswordUpdateNewPass = new Label("Enter new password: ");
-				//TextField txtPasswordUpdateuserTextField = new TextField();
 				PasswordField pwBoxOld = new PasswordField();
-				//VBox vbPasswordUpdatetxtField = new VBox(txtPasswordUpdateuserTextField);
 				vbtxtField.setAlignment(Pos.CENTER);
 				VBox vbPasswordUpdateold = new VBox(pwBoxOld);
 				vbPasswordUpdateold.setAlignment(Pos.CENTER);
@@ -286,7 +271,9 @@ public class Main extends Application {
 		                newWindow.setY(primaryStage.getY() + 100);
 		 
 		                newWindow.show();
-		                table.refresh();
+		                refreshTable();
+		                //table.setItems(tableData);
+		                //table.refresh();
 					}
 					else {
 						Label lblsecondLabel = new Label("Couldn't update password!");
@@ -337,6 +324,7 @@ public class Main extends Application {
 				//TextField txtUserTextField = new TextField();
 				User data = new User();
 				data.setUserName(txtuserTextField.getText());
+				data.setNewPassword(pwBox.getText());
 				DB_CRUD control = new DB_CRUD();
 				boolean flagDeleteData = control.deleteData(data);
 				if(flagDeleteData==true) {
@@ -357,7 +345,8 @@ public class Main extends Application {
 	                newWindow.setY(primaryStage.getY() + 100);
 	 
 	                newWindow.show();
-	                table.refresh();
+	                
+	                refreshTable();
 				}
 				else {
 					Label lblsecondLabel = new Label("Couldn't delete row!");
@@ -422,12 +411,77 @@ public class Main extends Application {
 		}
 	}
 	
+	private void buttonPressed(TableView table, Stage primaryStage) {
+		TablePosition pos = (TablePosition) table.getSelectionModel().getSelectedCells().get(0);
+//		TablePosition pos = (TablePosition) table.getSelectionModel().getSelectedItems();
+		int row = pos.getRow();
+		refreshTable();
+		ObservableList<User> userList;
+		userList = table.getSelectionModel().getSelectedItems();
+		//User item = (User) table.getSelectionModel().getSelectedItem();
+		User item = (User) table.getItems().get(row);
+		int UID = userList.get(0).getUserID();
+		String Uname = userList.get(0).getUserName();
+	
+		String Pass = userList.get(0).getNewPassword();
+		Button deletePerRow = userList.get(0).getActionButton();
+		//User item = new User(Uname,Pass);
+		
+		deletePerRow.setOnAction(e ->{
+			
+			DB_CRUD control = new DB_CRUD();
+			boolean flagDeleteData = control.deleteData(item);
+			if(flagDeleteData==true) {
+				Label lblsecondLabel = new Label("Row deleted successfully!");
+				 
+	            StackPane secondaryLayout2 = new StackPane();
+	            secondaryLayout2.getChildren().add(lblsecondLabel);
+
+	            Scene secondScene = new Scene(secondaryLayout2, 230, 100);
+
+	            // New window (Stage)
+	            Stage newWindow = new Stage();
+	            newWindow.setTitle("Second Stage");
+	            newWindow.setScene(secondScene);
+
+	            // Set position of second window, related to primary window.
+	            newWindow.setX(primaryStage.getX() + 200);
+	            newWindow.setY(primaryStage.getY() + 100);
+
+	            newWindow.show();
+	            
+	            refreshTable();
+			}
+			else {
+				Label lblsecondLabel = new Label("Couldn't delete row!");
+				 
+	            StackPane secondaryLayout2 = new StackPane();
+	            secondaryLayout2.getChildren().add(lblsecondLabel);
+
+	            Scene secondScene = new Scene(secondaryLayout2, 230, 100);
+
+	            // New window (Stage)
+	            Stage newWindow = new Stage();
+	            newWindow.setTitle("Second Stage");
+	            newWindow.setScene(secondScene);
+
+	            // Set position of second window, related to primary window.
+	            newWindow.setX(primaryStage.getX() + 200);
+	            newWindow.setY(primaryStage.getY() + 100);
+
+	            newWindow.show();
+			}
+		});
+	}
+	
+			
+	
+		
 	public void refreshTable()
 	{
-		
+		tableData.clear();
 		tableData.setAll(db.buildData());
 		table.setItems(tableData);
-		
 		
 	}
 	

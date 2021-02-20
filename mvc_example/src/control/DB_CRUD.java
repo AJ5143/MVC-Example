@@ -18,7 +18,10 @@ public class DB_CRUD {
 	{
 		boolean result = false;
 		String query1 = "insert into first(Username,Password)" + "values(?,?)";
-		String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
+		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		if(data.getUserName().isEmpty() || data.getNewPassword().isEmpty())
+			result = false;
+		else {
 		try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
@@ -30,14 +33,17 @@ public class DB_CRUD {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
+		}
 		return result;
 	}
 
 	public boolean updateData(User data) {
 		boolean result = false;	
 		String query1 = "Update first SET Password = ? WHERE Password = ?";
-		String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
+		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		if(data.getUserName().isEmpty() || data.getNewPassword().isEmpty())
+			result = false;
+		else {
 		try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
@@ -50,26 +56,28 @@ public class DB_CRUD {
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
+		}	
 		return result;
 	}
 
 	public boolean deleteData(User data) {
 		boolean result = false;
-		String query1 = "Delete from first WHERE Username = ?";
-		String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
-		try {
+		String query1 = "Delete from first WHERE Username = ? AND Password = ? ";
+		String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
+		if(data.getUserName().isEmpty() || data.getNewPassword().isEmpty())
+			result = false;
+		else {try {
 			Connection connection = DriverManager.getConnection(link);
 			PreparedStatement preparedStmt = connection.prepareStatement(query1);
 			preparedStmt.setString(1, data.getUserName());
-			//preparedStmt.setString(2, data.getNewPassword());
+			preparedStmt.setString(2, data.setNewPassword(data.getNewPassword()));
 	        preparedStmt.execute();
 	        result = true;
         }
 		catch(Exception e) {
 			e.printStackTrace();
 		}
-		
+		}
 		
 		return result;
 	}
@@ -77,10 +85,11 @@ public class DB_CRUD {
 	public ObservableList<User> data;
 	TableView<User> table;
 	
-	public ObservableList<User> buildData(){ 
+	public ObservableList<User> buildData()
+	{ 
 	    data = FXCollections.observableArrayList();
 	    try{      
-	    	String link = "jdbc:sqlite:C:\\Databases\\\\First.db";
+	    	String link = "jdbc:sqlite:C:\\Program Files\\DB Browser for SQLite\\First.db";
 	    	Connection con = DriverManager.getConnection(link);
 	        String SQL = "Select * from first Order By UserID";            
 	        ResultSet rs = con.createStatement().executeQuery(SQL);  
@@ -90,7 +99,6 @@ public class DB_CRUD {
 	            user.setUserName(rs.getString("UserName"));
 	            user.setNewPassword(rs.getString("Password"));
 	            user.setActionButton(new Button("DELETE"));
-	            
 	            data.add(user);                  
 	        }
 	        return data;

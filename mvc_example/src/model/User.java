@@ -64,7 +64,22 @@ public class User {
 		this.newPassword = newPassword;
 		this.userID = userID;
 	}
-
+	public void onButtonClick(TableView<User> table) {
+		//Button actionButton = new Button();
+		actionButton = new Button("DELETE");
+		this.actionButton.setOnAction(e -> {
+			ObservableList<User> userSelected, allUsers;
+			allUsers = table.getItems();
+			userSelected = table.getSelectionModel().getSelectedItems();
+			System.out.println("userSelected index" );
+			userSelected.forEach(allUsers::remove);
+			table.refresh();
+			
+			//table.refresh();
+			//actionButton = this.actionButton;
+			
+		});
+	}
 	public User() {
 		
 	}
@@ -77,15 +92,27 @@ public class User {
 		this.userID = userID;
 		this.actionButton = actionButton;
 	}
-public void onButtonClick(TableView<User> table) {
-	// TODO Auto-generated method stub
-	actionButton.setOnAction(e -> {
-		ObservableList<User> userSelected, allUsers;
-		allUsers = table.getItems();
-		userSelected = table.getSelectionModel().getSelectedItems();
-		userSelected.forEach(allUsers::remove);
-		
-	});
-}
 
+	public User(int uID, String uname, String pass) {
+		// TODO Auto-generated constructor stub
+		super();
+		this.userID = uID;
+		this.userName = uname;
+		this.newPassword = pass;
+	}
+
+	public User(int uID, String uname, String pass, Button deletePerRow) {
+		super();
+		this.userID = uID;
+		this.newPassword = pass;
+		this.actionButton = deletePerRow;
+	}
+
+	public User(String userName, String newPassword) {
+		super();
+		this.userName = userName;
+		this.newPassword = newPassword;
+	}
+	
+	
 }
