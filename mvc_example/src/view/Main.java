@@ -48,7 +48,8 @@ public class Main extends Application {
 	DB_CRUD db = new DB_CRUD();
 	User user = new User();
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage primaryStage) 
+	{
 		try {
 			//TODO i have to complete this
 			
@@ -125,8 +126,10 @@ public class Main extends Application {
 		    
 		    table.getColumns().setAll(UserIDColumn, UserNameColumn, PasswordColumn, ActionColumn);
 		    table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-		    tableData.setAll(db.buildData());
-			table.setItems(tableData);
+		    refreshTable();
+			
+			
+			
 			user.onButtonClick(table);
 		    //define a simple boolean cell value for the action column so that the column will only be shown for non-empty rows.
 //		    ActionColumn.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<User, Boolean>, ObservableValue<Boolean>>() {
@@ -175,7 +178,7 @@ public class Main extends Application {
 				data.setUserName(txtuserTextField.getText());
 				data.setNewPassword(pwBox.getText());
 				DB_CRUD control = new DB_CRUD();
-				if(txtuserTextField.getText().equals(null) || pwBox.getText().equals(null))
+				if(txtuserTextField.getText().isEmpty() && pwBox.getText().isEmpty())
 				{
 					Label lblsecondLabel = new Label("Please provide username and password both!");
 	                StackPane secondaryLayout = new StackPane();
@@ -196,9 +199,12 @@ public class Main extends Application {
 				}
 				boolean insertFlag = control.insertData(data);
 				if(insertFlag==true) {
+					refreshTable();
+					
 					Label lblsecondLabel = new Label("Data inserted successfully!");
 	                StackPane secondaryLayout = new StackPane();
 	                secondaryLayout.getChildren().add(lblsecondLabel);
+	                
 	 
 	                Scene secondScene = new Scene(secondaryLayout, 230, 100);
 	 
@@ -214,7 +220,6 @@ public class Main extends Application {
 	                newWindow.show();
 	                //table.refresh();
 	                //table.getItems().clear();
-	                table.setItems(tableData);
 	                
 	                
 				}
@@ -415,6 +420,15 @@ public class Main extends Application {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void refreshTable()
+	{
+		
+		tableData.setAll(db.buildData());
+		table.setItems(tableData);
+		
+		
 	}
 	
 	public static void main(String[] args) {
